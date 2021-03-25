@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,8 @@ public class ItemController {
 
   @GetMapping("/items/{id}")
   @ApiResponses(value = {@ApiResponse(code = 202, message = "User found successfully. :)")})
-  public ResponseEntity<Item> getItemById(@PathVariable(value = "id") Integer id) throws Exception {
+  public ResponseEntity<Item> getItemById(@PathVariable(value = "id") Integer id)
+      throws EntityNotFoundException {
     return new ResponseEntity<>(itemService.getItemById(id), HttpStatus.OK);
   }
 
@@ -42,14 +44,14 @@ public class ItemController {
   @ApiResponses(value = {@ApiResponse(code = 202, message = "User updated successfully. :)")})
   public ResponseEntity<Item> updateItem(
       @PathVariable(value = "id") Integer id, @Valid @RequestBody Item itemDetails)
-      throws Exception {
+      throws EntityNotFoundException {
     return new ResponseEntity<>(itemService.updateItem(id, itemDetails), HttpStatus.OK);
   }
 
   @DeleteMapping("/items/{id}")
   @ApiResponses(value = {@ApiResponse(code = 202, message = "User deleted successfully. :)")})
   public ResponseEntity<Map<String, Boolean>> deleteItem(@PathVariable(value = "id") Integer id)
-      throws Exception {
+      throws EntityNotFoundException {
     itemService.deleteItem(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

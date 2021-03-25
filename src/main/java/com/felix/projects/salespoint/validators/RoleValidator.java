@@ -1,25 +1,40 @@
 package com.felix.projects.salespoint.validators;
 
-import com.felix.projects.salespoint.entities.UserEntity;
-import com.felix.projects.salespoint.utils.EnumRoleValidator;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import java.util.Arrays;
+import com.felix.projects.salespoint.entities.RoleEntity;
+import com.felix.projects.salespoint.repository.RoleRepository;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 /** The type Role validator. */
-public class RoleValidator implements ConstraintValidator<EnumRoleValidator, UserEntity.Roles> {
+public class RoleValidator implements Validator {
 
-  private UserEntity.Roles[] subset;
+  private final RoleRepository roleRepository;
 
-  @Override
-  public void initialize(EnumRoleValidator constraint) {
-    this.subset = constraint.anyOf();
+  /**
+   * Instantiates a new Owner validator.
+   *
+   * @param roleRepository the role repository
+   */
+  public RoleValidator(RoleRepository roleRepository) {
+    this.roleRepository = roleRepository;
   }
 
   @Override
-  public boolean isValid(
-      UserEntity.Roles roles, ConstraintValidatorContext constraintValidatorContext) {
-    return roles == null || Arrays.asList(subset).contains(roles);
+  public boolean supports(Class<?> aClass) {
+    return RoleEntity.class.equals(aClass);
+  }
+
+  @Override
+  public void validate(Object o, Errors errors) {
+
+    if (o == null) {
+      errors.rejectValue("role", "role cannot be null.");
+    }
+
+    RoleEntity roleEntity = (RoleEntity) o;
+
+    if (roleEntity.getId() == null || !roleRepository.existsById(roleEntity.getId())) {
+      errors.rejectValue("role", "role does not exist.");
+    }
   }
 }

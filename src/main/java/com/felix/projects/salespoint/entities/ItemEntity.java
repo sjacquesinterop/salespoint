@@ -42,10 +42,8 @@ public class ItemEntity {
   @Positive
   private Float price;
 
-  //  @JoinColumn(referencedColumnName = "id")
-  //  @ManyToOne // (cascade = CascadeType.ALL)
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(referencedColumnName = "id")
+  @JoinColumn(referencedColumnName = "id", name = "owner")
   @NotNull
   private UserEntity owner;
 }

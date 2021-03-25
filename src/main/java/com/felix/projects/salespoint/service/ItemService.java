@@ -2,6 +2,7 @@ package com.felix.projects.salespoint.service;
 
 import com.felix.projects.salespoint.dto.Item;
 import com.felix.projects.salespoint.entities.ItemEntity;
+import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import com.felix.projects.salespoint.mapper.ItemMapper;
 import com.felix.projects.salespoint.repository.ItemRepository;
 import com.felix.projects.salespoint.repository.UserRepository;
@@ -13,7 +14,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ValidationException;
 import java.util.List;
 
 /** The type Item service. */
@@ -60,7 +60,7 @@ public class ItemService {
     ValidationUtils.invokeValidator(
         new OwnerValidator(userRepository), itemEntity.getOwner(), errors);
     if (errors.hasErrors()) {
-      throw new ValidationException();
+      throw new CustomValidationException("Business validation error", errors);
     }
     ItemEntity savedItemEntity = itemRepository.save(itemEntity);
     Item itemDto = ItemMapper.INSTANCE.toDto(savedItemEntity);

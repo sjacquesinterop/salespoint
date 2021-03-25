@@ -17,11 +17,6 @@ import java.util.Set;
 
 /** The type Error response. */
 @Data
-// @JsonTypeInfo(
-//    include = JsonTypeInfo.As.WRAPPER_OBJECT,
-//    use = JsonTypeInfo.Id.CUSTOM,
-//    property = "error",
-//    visible = true)
 public class ErrorResponse {
 
   private HttpStatus status;
@@ -106,21 +101,21 @@ public class ErrorResponse {
    *
    * @param errors the errors
    */
-  public void addValidationErrors(List<FieldError> errors) {
-    errors.forEach(this::addValidationError);
+  public <T> void addValidationErrors(List<T> errors) {
+
+    errors.forEach(
+        error -> {
+          if (error instanceof FieldError) {
+            this.addValidationError((FieldError) error);
+          }
+          if (error instanceof ObjectError) {
+            this.addValidationError((ObjectError) error);
+          }
+        });
   }
 
   private void addValidationError(ObjectError error) {
     this.addValidationError(error.getObjectName(), error.getDefaultMessage());
-  }
-
-  /**
-   * Add validation error.
-   *
-   * @param errors the errors
-   */
-  public void addValidationError(List<ObjectError> errors) {
-    errors.forEach(this::addValidationError);
   }
 
   private void addValidationError(ConstraintViolation<?> constraintViolation) {

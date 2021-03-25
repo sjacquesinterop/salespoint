@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,8 @@ public class UserController {
 
   @GetMapping("/users/{id}")
   @ApiResponses(value = {@ApiResponse(code = 202, message = "User found successfully. :)")})
-  public ResponseEntity<User> getUserById(@PathVariable(value = "id") Integer id) throws Exception {
+  public ResponseEntity<User> getUserById(@PathVariable(value = "id") Integer id)
+      throws EntityNotFoundException {
     return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
   }
 
@@ -42,14 +44,14 @@ public class UserController {
   @ApiResponses(value = {@ApiResponse(code = 202, message = "User updated successfully. :)")})
   public ResponseEntity<User> updateUser(
       @PathVariable(value = "id") Integer id, @Valid @RequestBody User userDetails)
-      throws Exception {
+      throws EntityNotFoundException {
     return new ResponseEntity<>(userService.updateUser(id, userDetails), HttpStatus.OK);
   }
 
   @DeleteMapping("/user/{id}")
   @ApiResponses(value = {@ApiResponse(code = 202, message = "User deleted successfully. :)")})
   public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable(value = "id") Integer id)
-      throws Exception {
+      throws EntityNotFoundException {
     userService.deleteUser(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

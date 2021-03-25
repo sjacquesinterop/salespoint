@@ -1,6 +1,5 @@
 package com.felix.projects.salespoint.dto;
 
-import com.felix.projects.salespoint.entities.UserEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.Getter;
@@ -23,5 +22,5 @@ public class User {
   @ApiModelProperty(accessMode = ApiModelProperty.AccessMode.READ_ONLY)
   private List<Item> listOfItems;
 
-  private UserEntity.Roles role;
+  private Integer role;
 }

@@ -2,9 +2,11 @@ package com.felix.projects.salespoint.service;
 
 import com.felix.projects.salespoint.dto.User;
 import com.felix.projects.salespoint.entities.UserEntity;
+import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import com.felix.projects.salespoint.mapper.UserMapper;
+import com.felix.projects.salespoint.repository.RoleRepository;
 import com.felix.projects.salespoint.repository.UserRepository;
-import com.felix.projects.salespoint.validators.TempRoleValidator;
+import com.felix.projects.salespoint.validators.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -12,7 +14,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ValidationException;
 import java.util.List;
 
 /** The type User service. */
@@ -20,6 +21,8 @@ import java.util.List;
 public class UserService {
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private RoleRepository roleRepository;
 
   /**
    * Get all users list.
@@ -54,9 +57,9 @@ public class UserService {
     UserEntity userEntity = UserMapper.INSTANCE.toEntity(user);
     Errors errors = new BeanPropertyBindingResult(userEntity, "userEntity");
     ValidationUtils.invokeValidator(
-        new TempRoleValidator(userEntity), userEntity.getRole(), errors);
+        new RoleValidator(roleRepository), userEntity.getRole(), errors);
     if (errors.hasErrors()) {
-      throw new ValidationException();
+      throw new CustomValidationException("Business validation exception", errors);
     }
     UserEntity savedUserEntity = userRepository.save(userEntity);
     User userDto = UserMapper.INSTANCE.toDto(savedUserEntity);

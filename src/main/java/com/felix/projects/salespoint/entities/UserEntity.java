@@ -44,23 +44,11 @@ public class UserEntity {
   @Email
   private String email;
 
-  @Column(name = "role", nullable = false)
   @NotNull
-  // @EnumRoleValidator(anyOf = {Roles.CLIENT, Roles.OWNER})
-  private Roles role; // not sure about this
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(referencedColumnName = "id", name = "role")
+  private RoleEntity role;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
-  // @JoinColumn(name = "owner", nullable = false)
   private List<ItemEntity> listOfItems;
-
-  public enum Roles {
-    CLIENT("client"),
-    OWNER("owner");
-
-    private final String role;
-
-    Roles(String role) {
-      this.role = role;
-    }
-  }
 }

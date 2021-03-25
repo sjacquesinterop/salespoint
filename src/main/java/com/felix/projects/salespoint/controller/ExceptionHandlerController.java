@@ -1,6 +1,7 @@
 package com.felix.projects.salespoint.controller;
 
 import com.felix.projects.salespoint.dto.ErrorResponse;
+import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
 
 /** The type Exception handler controller. */
 @ControllerAdvice
@@ -87,6 +87,12 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     return buildResponseEntity(errorResponse);
   }
 
+  /**
+   * Handle illegal argument exception response entity.
+   *
+   * @param e the e
+   * @return the response entity
+   */
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e) {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST);
@@ -94,10 +100,17 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     return buildResponseEntity(errorResponse);
   }
 
-  @ExceptionHandler(ValidationException.class)
-  public ResponseEntity<Object> handleValidationException(ValidationException e) {
+  /**
+   * Handle validation exception response entity.
+   *
+   * @param e the e
+   * @return the response entity
+   */
+  @ExceptionHandler(CustomValidationException.class)
+  public ResponseEntity<Object> handleValidationException(CustomValidationException e) {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE);
     errorResponse.setMessage("Error creating the entity.");
+    errorResponse.addValidationErrors(e.getErrors().getAllErrors());
     return buildResponseEntity(errorResponse);
   }
 }
