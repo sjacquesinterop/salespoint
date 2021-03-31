@@ -38,7 +38,7 @@ public class ItemService {
    *
    * @param id the item id
    * @return the item by id
-   * @throws Exception the exception
+   * @throws EntityNotFoundException the exception
    */
   public Item getItemById(Integer id) throws EntityNotFoundException {
 
@@ -73,7 +73,7 @@ public class ItemService {
    * @param id the item id
    * @param itemDetails the item details
    * @return the item
-   * @throws Exception the exception
+   * @throws EntityNotFoundException the exception
    */
   public Item updateItem(Integer id, Item itemDetails) throws EntityNotFoundException {
     Item item =
@@ -110,7 +110,7 @@ public class ItemService {
    *
    * @param id the item id
    * @return
-   * @throws Exception the exception
+   * @throws EntityNotFoundException the exception
    */
   public void deleteItem(Integer id) throws EntityNotFoundException {
     itemRepository

@@ -27,10 +27,6 @@ public class OwnerValidator implements Validator {
   @Override
   public void validate(Object o, Errors errors) {
 
-    if (o == null) {
-      errors.rejectValue("owner", "owner cannot be null.");
-    }
-
     UserEntity userEntity = (UserEntity) o;
 
     if (userEntity.getId() == null || !userRepository.existsById(userEntity.getId())) {

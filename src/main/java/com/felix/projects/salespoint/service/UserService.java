@@ -38,7 +38,7 @@ public class UserService {
    *
    * @param id the user id
    * @return the user by id
-   * @throws Exception the exception
+   * @throws EntityNotFoundException the exception
    */
   public User getUserById(Integer id) throws EntityNotFoundException {
     return UserMapper.INSTANCE.toDto(
@@ -73,7 +73,7 @@ public class UserService {
    * @param id the user id
    * @param userDetails the user details
    * @return user
-   * @throws Exception the exception
+   * @throws EntityNotFoundException the exception
    */
   public User updateUser(Integer id, User userDetails) throws EntityNotFoundException {
     User user =
@@ -105,8 +105,7 @@ public class UserService {
    * Delete user map.
    *
    * @param id the user id
-   * @return
-   * @throws Exception the exception
+   * @throws EntityNotFoundException the exception
    */
   public void deleteUser(Integer id) throws EntityNotFoundException {
     userRepository

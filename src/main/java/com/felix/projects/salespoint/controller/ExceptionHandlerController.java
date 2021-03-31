@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.persistence.EntityNotFoundException;
@@ -39,12 +37,10 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
    * Handle data integrity violation response entity.
    *
    * @param e the e
-   * @param request the request
    * @return the response entity
    */
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<Object> handleDataIntegrityViolation(
-      DataIntegrityViolationException e, WebRequest request) {
+  public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException e) {
     if (e.getCause() instanceof ConstraintViolationException) {
       return buildResponseEntity(
           new ErrorResponse(HttpStatus.CONFLICT, "Database error", e.getCause()));
@@ -65,25 +61,6 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST);
     errorResponse.setMessage("Validation error");
     errorResponse.addValidationErrors(e.getConstraintViolations());
-    return buildResponseEntity(errorResponse);
-  }
-
-  /**
-   * Handle method argument type mismatch response entity.
-   *
-   * @param e the e
-   * @param request the request
-   * @return the response entity
-   */
-  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ResponseEntity<Object> handleMethodArgumentTypeMismatch(
-      MethodArgumentTypeMismatchException e, WebRequest request) {
-    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST);
-    errorResponse.setMessage(
-        String.format(
-            "The parameter '%s' of value '%s' could not be converted to type '%s'",
-            e.getName(), e.getValue(), e.getRequiredType().getSimpleName()));
-    errorResponse.setDebugMessage(e.getMessage());
     return buildResponseEntity(errorResponse);
   }
 

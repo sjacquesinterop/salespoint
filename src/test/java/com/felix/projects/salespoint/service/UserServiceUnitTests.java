@@ -3,6 +3,7 @@ package com.felix.projects.salespoint.service;
 import com.felix.projects.salespoint.dto.User;
 import com.felix.projects.salespoint.entities.RoleEntity;
 import com.felix.projects.salespoint.entities.UserEntity;
+import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import com.felix.projects.salespoint.mapper.UserMapper;
 import com.felix.projects.salespoint.repository.RoleRepository;
 import com.felix.projects.salespoint.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,29 +26,22 @@ import static org.mockito.Mockito.*;
 
 @ActiveProfiles("userTest")
 @RunWith(MockitoJUnitRunner.class)
-public class UserServiceUnitTest { // TODO add at least a test per method
+public class UserServiceUnitTests {
+
+  private final UserEntity testUser1 = new UserEntity();
+  private final UserEntity testUser2 = new UserEntity();
+  private final UserEntity testUser3 = new UserEntity();
+  private final RoleEntity role = new RoleEntity();
 
   @InjectMocks private UserService userService;
-
   @Mock private UserRepository userRepository;
-
   @Mock private RoleRepository roleRepository;
+  @Mock private Errors errors;
 
   @Before
   public void init() {
     MockitoAnnotations.initMocks(this);
-  }
 
-  @Test
-  public void
-      getAllUsersTest() { // TODO kinda confused with the types and shit so not sure if this is
-    // right
-
-    UserEntity testUser1 = new UserEntity();
-    UserEntity testUser2 = new UserEntity();
-    UserEntity testUser3 = new UserEntity();
-
-    RoleEntity role = new RoleEntity();
     role.setId(1);
 
     testUser1.setId(1);
@@ -66,6 +61,12 @@ public class UserServiceUnitTest { // TODO add at least a test per method
     testUser3.setEmail("human@gmail.com");
     testUser3.setPassword("!Password123");
     testUser3.setRole(role);
+  }
+
+  @Test
+  public void
+      getAllUsersTest() { // TODO kinda confused with the types and shit so not sure if this is
+    // right
 
     List<UserEntity> list = new ArrayList<>();
 
@@ -86,17 +87,6 @@ public class UserServiceUnitTest { // TODO add at least a test per method
   @Test
   public void getUserByIdTest() {
 
-    UserEntity testUser1 = new UserEntity();
-
-    RoleEntity role = new RoleEntity();
-    role.setId(1);
-
-    testUser1.setId(1);
-    testUser1.setName("Legolas");
-    testUser1.setEmail("elf@gmail.com");
-    testUser1.setPassword("!Password123");
-    testUser1.setRole(role);
-
     when(userRepository.findById(1)).thenReturn(java.util.Optional.of(testUser1));
 
     User retrievedUser = userService.getUserById(1);
@@ -106,20 +96,7 @@ public class UserServiceUnitTest { // TODO add at least a test per method
   }
 
   @Test
-  public void
-      createUserTest() { // TODO I'm cheesing this waaaay too fucking hard, need to look more into
-    // it
-
-    UserEntity testUser1 = new UserEntity();
-
-    RoleEntity role = new RoleEntity();
-    role.setId(1);
-
-    testUser1.setId(1);
-    testUser1.setName("Legolas");
-    testUser1.setEmail("elf@gmail.com");
-    testUser1.setPassword("!Password123");
-    testUser1.setRole(role);
+  public void createUserTest() {
 
     User user = UserMapper.INSTANCE.toDto(testUser1);
 
@@ -133,29 +110,59 @@ public class UserServiceUnitTest { // TODO add at least a test per method
     assertEquals(createdUser.getName(), testUser1.getName());
   }
 
+  @Test(expected = CustomValidationException.class)
+  public void createNotValidUserTest() {
+
+    User badUser = new User();
+
+    userService.createUser(badUser);
+  }
+
   @Test
   public void updateUserTest() {
-
-    UserEntity testUser1 = new UserEntity();
-
-    RoleEntity role = new RoleEntity();
-    role.setId(1);
-
-    testUser1.setId(1);
-    testUser1.setName("Legolas");
-    testUser1.setEmail("elf@gmail.com");
-    testUser1.setPassword("!Password123");
-    testUser1.setRole(role);
+    String updatedName = "Bilbon";
+    String updatedPassword = "Sauron$ucks123";
+    String updatedEmail = "hobbit@gmail.com";
+    RoleEntity newRole = new RoleEntity();
+    newRole.setId(2);
 
     User tempUser = new User();
-    tempUser.setName("Bilbon");
+    tempUser.setName(updatedName);
+    tempUser.setName(updatedName);
+    tempUser.setPassword(updatedPassword);
+    tempUser.setEmail(updatedEmail);
+    tempUser.setRole(2);
+
+    testUser1.setName(updatedName);
+    testUser1.setName(updatedName);
+    testUser1.setName(updatedName);
+    testUser1.setPassword(updatedPassword);
+    testUser1.setEmail(updatedEmail);
+    testUser1.setRole(newRole);
 
     when(userRepository.findById(1)).thenReturn(java.util.Optional.of(testUser1));
+
+    when(userRepository.save(any(UserEntity.class))) // TODO temporary fix, not the greatest
+        .thenReturn(testUser1);
 
     User updatedUser =
         userService.updateUser(1, tempUser); // TODO find out why tf this returns null
 
     assertNotNull(updatedUser);
-    assertEquals(updatedUser.getName(), "Bilbon");
+    assertEquals(updatedUser.getName(), updatedName);
+    assertEquals(updatedUser.getEmail(), updatedEmail);
+    assertEquals(updatedUser.getPassword(), updatedPassword);
+    assertEquals(updatedUser.getRole(), newRole.getId());
+    assertEquals(updatedUser.getId(), testUser1.getId());
+  }
+
+  @Test
+  public void deleteUserTest() {
+
+    when(userRepository.findById(1)).thenReturn(java.util.Optional.of(testUser1));
+
+    userService.deleteUser(1);
+
+    verify(userRepository, times(1)).deleteById(1);
   }
 }

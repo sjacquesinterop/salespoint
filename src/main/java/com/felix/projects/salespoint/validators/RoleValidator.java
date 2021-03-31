@@ -27,10 +27,6 @@ public class RoleValidator implements Validator {
   @Override
   public void validate(Object o, Errors errors) {
 
-    if (o == null) {
-      errors.rejectValue("role", "role cannot be null.");
-    }
-
     RoleEntity roleEntity = (RoleEntity) o;
 
     if (roleEntity.getId() == null || !roleRepository.existsById(roleEntity.getId())) {
