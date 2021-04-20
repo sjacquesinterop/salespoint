@@ -81,7 +81,7 @@ public class UserControllerUnitTests {
 
     assertNotNull(responseEntity);
     assertNotNull(responseEntity.getBody());
-    assertEquals(responseEntity.getStatusCode().value(), HttpStatus.ACCEPTED.value());
+    assertEquals(responseEntity.getStatusCode().value(), HttpStatus.OK.value());
     assertEquals(responseEntity.getBody().size(), list.size());
   }
 
@@ -135,7 +135,6 @@ public class UserControllerUnitTests {
     testUser2.setEmail(updatedEmail);
     testUser2.setRole(newRole);
 
-    // TODO change this to match ItemServiceUnitTest
     when(userService.updateUser(2, tempUser)).thenReturn(UserMapper.INSTANCE.toDto(testUser2));
 
     ResponseEntity<User> responseEntity = userController.updateUser(2, tempUser);

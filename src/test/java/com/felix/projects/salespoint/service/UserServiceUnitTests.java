@@ -1,12 +1,15 @@
 package com.felix.projects.salespoint.service;
 
 import com.felix.projects.salespoint.dto.User;
+import com.felix.projects.salespoint.entities.ItemEntity;
 import com.felix.projects.salespoint.entities.RoleEntity;
 import com.felix.projects.salespoint.entities.UserEntity;
+import com.felix.projects.salespoint.entities.WishListEntity;
 import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import com.felix.projects.salespoint.mapper.UserMapper;
 import com.felix.projects.salespoint.repository.RoleRepository;
 import com.felix.projects.salespoint.repository.UserRepository;
+import com.felix.projects.salespoint.repository.WishlistRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ public class UserServiceUnitTests {
   @InjectMocks private UserService userService;
   @Mock private UserRepository userRepository;
   @Mock private RoleRepository roleRepository;
-  @Mock private Errors errors;
+  @Mock private WishlistRepository wishlistRepository;
 
   @Before
   public void init() {
@@ -64,9 +66,7 @@ public class UserServiceUnitTests {
   }
 
   @Test
-  public void
-      getAllUsersTest() { // TODO kinda confused with the types and shit so not sure if this is
-    // right
+  public void getAllUsersTest() {
 
     List<UserEntity> list = new ArrayList<>();
 
@@ -142,11 +142,9 @@ public class UserServiceUnitTests {
 
     when(userRepository.findById(1)).thenReturn(java.util.Optional.of(testUser1));
 
-    when(userRepository.save(any(UserEntity.class))) // TODO temporary fix, not the greatest
-        .thenReturn(testUser1);
+    when(userRepository.save(any(UserEntity.class))).thenReturn(testUser1);
 
-    User updatedUser =
-        userService.updateUser(1, tempUser); // TODO find out why tf this returns null
+    User updatedUser = userService.updateUser(1, tempUser);
 
     assertNotNull(updatedUser);
     assertEquals(updatedUser.getName(), updatedName);
@@ -159,7 +157,15 @@ public class UserServiceUnitTests {
   @Test
   public void deleteUserTest() {
 
+    List<ItemEntity> itemList = new ArrayList<>();
+
+    testUser1.setListOfItems(itemList);
+
     when(userRepository.findById(1)).thenReturn(java.util.Optional.of(testUser1));
+
+    List<WishListEntity> list = new ArrayList<>();
+
+    when(wishlistRepository.findWishListEntityByIdUserIdEquals(1)).thenReturn(list);
 
     userService.deleteUser(1);
 

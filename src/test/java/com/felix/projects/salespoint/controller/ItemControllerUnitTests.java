@@ -87,7 +87,7 @@ public class ItemControllerUnitTests {
 
     assertNotNull(responseEntity);
     assertNotNull(responseEntity.getBody());
-    assertEquals(responseEntity.getStatusCode().value(), HttpStatus.ACCEPTED.value());
+    assertEquals(responseEntity.getStatusCode().value(), HttpStatus.OK.value());
     assertEquals(responseEntity.getBody().size(), list.size());
   }
 

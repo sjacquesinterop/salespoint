@@ -99,6 +99,7 @@ public class ErrorResponse {
    * The Add validation errors. @param errors the errors @param errors the errors @param errors the
    * errors
    *
+   * @param <T> the type parameter
    * @param errors the errors
    */
   public <T> void addValidationErrors(List<T> errors) {
@@ -107,9 +108,6 @@ public class ErrorResponse {
         error -> {
           if (error instanceof FieldError) {
             this.addValidationError((FieldError) error);
-          }
-          if (error instanceof ObjectError) {
-            this.addValidationError((ObjectError) error);
           }
         });
   }

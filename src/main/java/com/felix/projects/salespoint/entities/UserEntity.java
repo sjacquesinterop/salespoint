@@ -24,7 +24,7 @@ public class UserEntity {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
 
-  @Column(name = "name", nullable = false) // Add @NotNull si tu veux check  si c'est null
+  @Column(name = "name", nullable = false)
   @NotNull
   @Pattern(regexp = "^[a-zA-Z]*$", message = "Must only be letters.")
   @Size(min = 1, max = 64)
@@ -35,13 +35,13 @@ public class UserEntity {
   @Pattern(
       regexp = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\\W).*$",
       message =
-          "Must contain : Minimum 8 characters, maximum 16 characters, at least a capital letter, at least a minuscule letter, at least a number and at least a symbol.")
+          "Must contain : At least a capital letter, at least a minuscule letter, at least a number and at least a symbol.")
   @Size(min = 8, max = 16)
   private String password;
 
   @Column(name = "email", nullable = false)
   @NotNull
-  @Email
+  @Email(message = "This is not a valid email address.")
   private String email;
 
   @NotNull
