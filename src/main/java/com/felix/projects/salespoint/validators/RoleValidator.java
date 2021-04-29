@@ -30,7 +30,8 @@ public class RoleValidator implements Validator {
     RoleEntity roleEntity = (RoleEntity) o;
 
     if (roleEntity.getId() == null || !roleRepository.existsById(roleEntity.getId())) {
-      errors.rejectValue("role", "role does not exist.");
+      errors.rejectValue(
+          "id", "role does not exist.", "Role with id " + roleEntity.getId() + " does not exist.");
     }
   }
 }

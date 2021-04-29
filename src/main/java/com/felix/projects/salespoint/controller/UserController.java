@@ -24,7 +24,7 @@ public class UserController {
   @ApiResponses(
       value = {@ApiResponse(code = 202, message = "Fetched list of users successfully. :)")})
   public ResponseEntity<List<User>> getAllUsers() {
-    return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.ACCEPTED);
+    return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
   }
 
   @GetMapping("/users/{id}")
@@ -48,7 +48,7 @@ public class UserController {
     return new ResponseEntity<>(userService.updateUser(id, userDetails), HttpStatus.OK);
   }
 
-  @DeleteMapping("/user/{id}")
+  @DeleteMapping("/users/{id}")
   @ApiResponses(value = {@ApiResponse(code = 202, message = "User deleted successfully. :)")})
   public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable(value = "id") Integer id)
       throws EntityNotFoundException {

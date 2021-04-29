@@ -30,7 +30,8 @@ public class OwnerValidator implements Validator {
     UserEntity userEntity = (UserEntity) o;
 
     if (userEntity.getId() == null || !userRepository.existsById(userEntity.getId())) {
-      errors.rejectValue("owner", "owner does not exist.");
+      errors.rejectValue(
+          "id", "userEntity.getId()", "Owner with id " + userEntity.getId() + " does not exist.");
     }
   }
 }

@@ -1,11 +1,16 @@
 package com.felix.projects.salespoint.service;
 
 import com.felix.projects.salespoint.dto.User;
+import com.felix.projects.salespoint.entities.ItemEntity;
 import com.felix.projects.salespoint.entities.UserEntity;
+import com.felix.projects.salespoint.entities.WishListEntity;
+import com.felix.projects.salespoint.entities.WishListId;
 import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import com.felix.projects.salespoint.mapper.UserMapper;
+import com.felix.projects.salespoint.mapper.WishlistMapper;
 import com.felix.projects.salespoint.repository.RoleRepository;
 import com.felix.projects.salespoint.repository.UserRepository;
+import com.felix.projects.salespoint.repository.WishlistRepository;
 import com.felix.projects.salespoint.validators.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,10 @@ public class UserService {
   @Autowired private UserRepository userRepository;
 
   @Autowired private RoleRepository roleRepository;
+
+  @Autowired private WishlistRepository wishlistRepository;
+
+  @Autowired private ItemService itemService;
 
   /**
    * Get all users list.
@@ -54,17 +63,14 @@ public class UserService {
    * @return the user
    */
   public User createUser(User user) {
-    UserEntity userEntity = UserMapper.INSTANCE.toEntity(user);
-    Errors errors = new BeanPropertyBindingResult(userEntity, "userEntity");
-    ValidationUtils.invokeValidator(
-        new RoleValidator(roleRepository), userEntity.getRole(), errors);
+    UserEntity newUser = UserMapper.INSTANCE.toEntity(user);
+    Errors errors = new BeanPropertyBindingResult(newUser, "userEntity");
+    ValidationUtils.invokeValidator(new RoleValidator(roleRepository), newUser.getRole(), errors);
     if (errors.hasErrors()) {
-      throw new CustomValidationException("Business validation exception", errors);
+      throw new CustomValidationException("Error creating the user : Role invalid.", errors);
     }
-    UserEntity savedUserEntity = userRepository.save(userEntity);
-    User userDto = UserMapper.INSTANCE.toDto(savedUserEntity);
-    return userDto;
-    // return UserMapper.INSTANCE.toDto(userRepository.save(UserMapper.INSTANCE.toEntity(user)));
+    UserEntity savedUserEntity = userRepository.save(newUser);
+    return UserMapper.INSTANCE.toDto(savedUserEntity);
   }
 
   /**
@@ -108,9 +114,29 @@ public class UserService {
    * @throws EntityNotFoundException the exception
    */
   public void deleteUser(Integer id) throws EntityNotFoundException {
-    userRepository
-        .findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("User " + id + " not found"));
+    UserEntity userEntity =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("User " + id + " not found"));
+
+    List<ItemEntity> listOfItems = userEntity.getListOfItems();
+
+    if (listOfItems.size() > 0) {
+      for (ItemEntity item : listOfItems) { // TODO CHANGE THIS TO NOT USE DELETEITEM
+        itemService.deleteItem(item.getId());
+      }
+    }
+
+    if (wishlistRepository.findWishListEntityByIdUserIdEquals(id).size() > 0) {
+
+      List<WishListEntity> list = wishlistRepository.findWishListEntityByIdUserIdEquals(id);
+
+      for (WishListEntity wishListEntity : list) {
+
+        WishListId currentId = WishlistMapper.INSTANCE.toId(wishListEntity);
+        wishlistRepository.deleteById(currentId);
+      }
+    }
     userRepository.deleteById(id);
   }
 }

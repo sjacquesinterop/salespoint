@@ -4,10 +4,12 @@ import com.felix.projects.salespoint.dto.Item;
 import com.felix.projects.salespoint.entities.ItemEntity;
 import com.felix.projects.salespoint.entities.RoleEntity;
 import com.felix.projects.salespoint.entities.UserEntity;
+import com.felix.projects.salespoint.entities.WishListEntity;
 import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import com.felix.projects.salespoint.mapper.ItemMapper;
 import com.felix.projects.salespoint.repository.ItemRepository;
 import com.felix.projects.salespoint.repository.UserRepository;
+import com.felix.projects.salespoint.repository.WishlistRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,13 +18,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("itemTest")
@@ -35,7 +35,7 @@ public class ItemServiceUnitTests {
   private final RoleEntity role = new RoleEntity();
   @Mock private ItemRepository itemRepository;
   @Mock private UserRepository userRepository;
-  @Mock private Errors errors;
+  @Mock private WishlistRepository wishlistRepository;
   @InjectMocks private ItemService itemService;
 
   @Before
@@ -177,8 +177,17 @@ public class ItemServiceUnitTests {
 
     when(itemRepository.findById(1)).thenReturn(java.util.Optional.of(testItem1));
 
+    List<WishListEntity> list = new ArrayList<>();
+
+    when(wishlistRepository.findWishListEntityByIdItemIdEquals(1)).thenReturn(list);
+
     itemService.deleteItem(1);
 
     verify(itemRepository, times(1)).deleteById(1);
+  }
+
+  @Test
+  public void NiceTest() {
+    assertTrue(true);
   }
 }

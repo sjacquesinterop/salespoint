@@ -28,7 +28,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
    */
   @ExceptionHandler(EntityNotFoundException.class)
   public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException e) {
-    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND);
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, e);
     errorResponse.setMessage(e.getMessage());
     return buildResponseEntity(errorResponse);
   }
@@ -58,7 +58,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
   public ResponseEntity<Object> handleConstraintViolation(
       javax.validation.ConstraintViolationException e) {
 
-    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST);
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e);
     errorResponse.setMessage("Validation error");
     errorResponse.addValidationErrors(e.getConstraintViolations());
     return buildResponseEntity(errorResponse);
@@ -72,7 +72,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
    */
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e) {
-    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST);
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e);
     errorResponse.setMessage(e.getMessage());
     return buildResponseEntity(errorResponse);
   }
@@ -85,8 +85,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
    */
   @ExceptionHandler(CustomValidationException.class)
   public ResponseEntity<Object> handleValidationException(CustomValidationException e) {
-    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE);
-    errorResponse.setMessage("Error creating the entity.");
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE, e.getMessage(), e);
     errorResponse.addValidationErrors(e.getErrors().getAllErrors());
     return buildResponseEntity(errorResponse);
   }

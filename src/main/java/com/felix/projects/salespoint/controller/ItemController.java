@@ -24,7 +24,7 @@ public class ItemController {
   @ApiResponses(
       value = {@ApiResponse(code = 202, message = "Fetched list of items successfully. :)")})
   public ResponseEntity<List<Item>> getAllItems() {
-    return new ResponseEntity<>(itemService.getAllItems(), HttpStatus.ACCEPTED);
+    return new ResponseEntity<>(itemService.getAllItems(), HttpStatus.OK);
   }
 
   @GetMapping("/items/{id}")

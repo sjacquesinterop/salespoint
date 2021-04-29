@@ -2,10 +2,14 @@ package com.felix.projects.salespoint.service;
 
 import com.felix.projects.salespoint.dto.Item;
 import com.felix.projects.salespoint.entities.ItemEntity;
+import com.felix.projects.salespoint.entities.WishListEntity;
+import com.felix.projects.salespoint.entities.WishListId;
 import com.felix.projects.salespoint.exceptions.CustomValidationException;
 import com.felix.projects.salespoint.mapper.ItemMapper;
+import com.felix.projects.salespoint.mapper.WishlistMapper;
 import com.felix.projects.salespoint.repository.ItemRepository;
 import com.felix.projects.salespoint.repository.UserRepository;
+import com.felix.projects.salespoint.repository.WishlistRepository;
 import com.felix.projects.salespoint.validators.OwnerValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,8 @@ public class ItemService {
   @Autowired private ItemRepository itemRepository;
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private WishlistRepository wishlistRepository;
 
   /**
    * Get all items list.
@@ -45,7 +51,7 @@ public class ItemService {
     return ItemMapper.INSTANCE.toDto(
         itemRepository
             .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("User " + id + " not found")));
+            .orElseThrow(() -> new EntityNotFoundException("Item " + id + " not found")));
   }
 
   /**
@@ -55,16 +61,14 @@ public class ItemService {
    * @return the item
    */
   public Item createItem(Item item) {
-    ItemEntity itemEntity = ItemMapper.INSTANCE.toEntity(item);
-    Errors errors = new BeanPropertyBindingResult(itemEntity, "itemEntity");
-    ValidationUtils.invokeValidator(
-        new OwnerValidator(userRepository), itemEntity.getOwner(), errors);
+    ItemEntity newItem = ItemMapper.INSTANCE.toEntity(item);
+    Errors errors = new BeanPropertyBindingResult(newItem, "itemEntity");
+    ValidationUtils.invokeValidator(new OwnerValidator(userRepository), newItem.getOwner(), errors);
     if (errors.hasErrors()) {
-      throw new CustomValidationException("Business validation error", errors);
+      throw new CustomValidationException("Error creating the item : Owner invalid.", errors);
     }
-    ItemEntity savedItemEntity = itemRepository.save(itemEntity);
-    Item itemDto = ItemMapper.INSTANCE.toDto(savedItemEntity);
-    return itemDto;
+    ItemEntity savedItemEntity = itemRepository.save(newItem);
+    return ItemMapper.INSTANCE.toDto(savedItemEntity);
   }
 
   /**
@@ -116,6 +120,17 @@ public class ItemService {
     itemRepository
         .findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Item " + id + " not found"));
+
+    if (wishlistRepository.findWishListEntityByIdItemIdEquals(id).size() > 0) {
+
+      List<WishListEntity> list = wishlistRepository.findWishListEntityByIdItemIdEquals(id);
+
+      for (WishListEntity wishListEntity : list) {
+
+        WishListId currentId = WishlistMapper.INSTANCE.toId(wishListEntity);
+        wishlistRepository.deleteById(currentId);
+      }
+    }
     itemRepository.deleteById(id);
   }
 }
